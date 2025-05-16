@@ -1,6 +1,13 @@
 ---
-- name: Ping Windows Server
+- name: Test WinRM Port 5985
   hosts: all
   tasks:
-    - name: Ping using win_ping
-      ansible.windows.win_ping:
+    - name: Check if port 5985 is open on Windows server
+      ansible.builtin.shell: "nc -zv {{ win_host }} 5985"
+      register: result
+      ignore_errors: yes
+
+    - name: Show result
+      ansible.builtin.debug:
+        var: result.stdout
+
