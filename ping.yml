@@ -1,9 +1,9 @@
 ---
-- name: Test WinRM Port 5985
+- name: Test Connection to Port 443
   hosts: all
   tasks:
     - name: Check if port 5985 is open on Windows server
-      ansible.builtin.shell: "nc -zv {{ win_host }} 5985"
+      ansible.builtin.shell: "nc -zv {{ win_host }} 443"
       register: result
       ignore_errors: yes
 
