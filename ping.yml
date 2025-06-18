@@ -1,3 +1,4 @@
+---
    - name: Ping test with multiple ports
      hosts: all
      gather_facts: false
