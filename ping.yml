@@ -1,22 +1,26 @@
----
-- name: Check port 443 on target host
-  hosts: all  # Replace with your target host
-  tasks:
-    - name: Check if port 443 is open
-      wait_for:
-        host: all  # Replace with your target host
-        port: 443
-        timeout: 5  # Timeout in seconds
-      delegate_to: localhost # Run this check from the tower server
-      register: port_check_result
+   - name: Ping test with multiple ports
+     hosts: all
+     gather_facts: false
+     tasks:
+       - name: Check connectivity on each port
+         ansible.builtin.wait_for:
+           host: "{{ ansible_host }}"
+           port: "{{ item }}"
+           timeout: 5
+           state: started
+         loop: "{{ target_ports }}"
+         register: port_results
+         ignore_errors: true  # Handle cases where some ports might not be open
 
-    - name: Debug the result
-      debug:
-        msg: "Port 443 is reachable on your_target_host"
-      when: port_check_result.reachable
-      
-    - name: Debug the result
-      debug:
-        msg: "Port 443 is not reachable on your_target_host"
-      when: not port_check_result.reachable
+       - name: Gather results
+         debug:
+           msg: "Port {{ item.item }}: {{ item.state }}"
+         loop: "{{ port_results.results }}"
+         when: item is defined
+
+       - name: Failed results
+         debug:
+           msg: "Port {{ item.item }}: {{ item.msg }}"
+         loop: "{{ port_results.results }}"
+         when: item.msg is defined
 
