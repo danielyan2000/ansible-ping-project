@@ -1,13 +1,22 @@
 ---
-- name: Test Connection to Port 443
-  hosts: all
+- name: Check port 443 on target host
+  hosts: all  # Replace with your target host
   tasks:
-    - name: Check if port 5985 is open on Windows server
-      ansible.builtin.shell: "nc -zv {{ win_host }} 443"
-      register: result
-      ignore_errors: yes
+    - name: Check if port 443 is open
+      wait_for:
+        host: all  # Replace with your target host
+        port: 443
+        timeout: 5  # Timeout in seconds
+      delegate_to: localhost # Run this check from the tower server
+      register: port_check_result
 
-    - name: Show result
-      ansible.builtin.debug:
-        var: result.stdout
+    - name: Debug the result
+      debug:
+        msg: "Port 443 is reachable on your_target_host"
+      when: port_check_result.reachable
+      
+    - name: Debug the result
+      debug:
+        msg: "Port 443 is not reachable on your_target_host"
+      when: not port_check_result.reachable
 
