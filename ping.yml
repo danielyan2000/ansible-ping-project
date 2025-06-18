@@ -1,5 +1,5 @@
 ---
-   - name: Ping test with multiple ports #add a comment
+   - name: Ping test with multiple ports
      hosts: all
      gather_facts: false
      tasks:
