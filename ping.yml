@@ -1,12 +1,15 @@
 ---
-   - name: Ping test with multiple ports # 443 connection refused
+   - name: Ping test with multiple ports
      hosts: all
      gather_facts: false
+     vars:
+       windows_ports: "{{ target_ports }}"
+       
      tasks:
        - name: Check connectivity on each port
          ansible.builtin.wait_for:
            host: "{{ ansible_host }}"
-           port: 5986 #"{{ item }}"
+           port: "{{ item }}"
            timeout: 5
            state: started
          loop: "{{ target_ports }}"
@@ -18,6 +21,13 @@
            msg: "Port {{ item.item }}: {{ item.state }}"
          loop: "{{ port_results.results }}"
          when: item is defined
+
+       - name: Display results
+         ansible.builtin.debug:
+           msg: "Host: {{ inventory_hostname }}, Port: {{ item }}, Status: {{ port_results.results[item_index].state }}"
+         loop: "{{ target_ports }}"
+         loop_control:
+           index_var: item_index
 
        - name: Failed results
          debug:
