@@ -4,13 +4,33 @@
      gather_facts: false
      vars:
        api_user: "{{ ansible_user }}"
-       api_password: "[[ ansible_password }}"
+       api_password: "{{ ansible_password }}"
        
      tasks:
        - name: Define target ports
          set_fact:
            windows_ports: "{{ target_ports }}"
+
+       - name: Basic win_ping test
+         win_ping:
+         register: ping_result
+         ignore_errors: true
          
+       - name: Display ping result
+         debug:
+           var: ping_result
+
+       - name: Test individual ports
+         win_shell: |
+           Test-NetConnection -ComputerName "{{ ansible_host }}" -Port {{ item }}
+         loop: "{{ windows_ports }}"
+         register: port_results_win_shell
+         ignore_errors: true
+
+       - name: Display port test results
+         debug:
+           var: port_results_win_shell
+        
        - name: Check connectivity on each port
          ansible.builtin.wait_for:
            host: "{{ ansible_host }}"
@@ -22,23 +42,23 @@
          ignore_errors: true  # Handle cases where some ports might not be open
          delegate_to: localhost
 
-       #- name: Gather results
-        # debug:
-         #  msg: "Port {{ item.item }}: {{ item.state }}"
-         #loop: "{{ port_results.results }}"
-         #when: item is defined
+       - name: Gather results
+         debug:
+           msg: "Port {{ item.item }}: {{ item.state }}"
+         loop: "{{ port_results.results }}"
+         when: item is defined
 
-       - name: Display results
-         ansible.builtin.debug:
-           msg: "Host: {{ inventory_hostname }}, Port: {{ item }}, Status: {{ port_results.results[item_index].state }}"
-         loop: "{{ windows_ports }}"
+       #- name: Display results
+        # ansible.builtin.debug:
+         #  msg: "Host: {{ inventory_hostname }}, Port: {{ item }}, Status: {{ port_results.results[item_index].state }}"
+         #loop: "{{ windows_ports }}"
          #loop: "{{ port_results.results }}"
-         loop_control:
-           index_var: item_index
+         #loop_control:
+          # index_var: item_index
 
-       #- name: Failed results
-        # debug:
-         #  msg: "Port {{ item.item }}: {{ item.msg }}"
-         #loop: "{{ port_results.results }}"
-         #when: item.msg is defined
+       - name: Failed results
+         debug:
+           msg: "Port {{ item.item }}: {{ item.msg }}"
+         loop: "{{ port_results.results }}"
+         when: item.msg is defined
 
