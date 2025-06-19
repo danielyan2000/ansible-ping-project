@@ -2,7 +2,7 @@
    - name: Ping test with multiple ports
      hosts: all
      gather_facts: false
-     var:
+     vars:
        api_user: "{{ ansible_user }}"
        api_password: "[[ ansible_password }}"
        
