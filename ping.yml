@@ -9,7 +9,7 @@
        - name: Check connectivity on each port
          ansible.builtin.wait_for:
            host: "{{ ansible_host }}"
-           port: "{{ item.item }}"
+           port: "{{ item }}"
            timeout: 5
            state: started
          loop: "{{ windows_ports }}"
