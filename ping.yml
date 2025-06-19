@@ -2,6 +2,9 @@
    - name: Ping test with multiple ports
      hosts: all
      gather_facts: false
+     var:
+       api_user: "{{ ansible_user }}"
+       api_password: "[[ ansible_password }}"
        
      tasks:
        - name: Define target ports
@@ -27,7 +30,7 @@
 
        - name: Display results
          ansible.builtin.debug:
-           msg: "Host: {{ inventory_hostname }}, Port: {{ item.item }}, Status: {{ port_results.results[item_index].state }}"
+           msg: "Host: {{ inventory_hostname }}, Port: {{ item }}, Status: {{ port_results.results[item_index].state }}"
          loop: "{{ windows_ports }}"
          #loop: "{{ port_results.results }}"
          loop_control:
