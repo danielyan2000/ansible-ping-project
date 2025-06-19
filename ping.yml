@@ -11,14 +11,14 @@
          set_fact:
            windows_ports: "{{ target_ports }}"
 
-       - name: Basic win_ping test
-         win_ping:
-         register: ping_result
-         ignore_errors: true
+       #- name: Basic win_ping test
+       #  win_ping:
+       #  register: ping_result
+       #  ignore_errors: true
          
-       - name: Display ping result
-         debug:
-           var: ping_result
+       #- name: Display ping result
+       #  debug:
+       #    var: ping_result
 
        - name: Test individual ports
          win_shell: |
